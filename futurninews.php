@@ -74,6 +74,30 @@ function add_futurninews_metabox(){
 }
 add_action( 'add_meta_boxes_futurninews','add_futurninews_metabox');
 
+/*
+* Add WYSIWYG-editor:
+*/
+function register_meta_boxen() {
+	add_meta_box("wysiwyg-editor-2", "Second Column", "second_column_box",
+	"futurninews", "normal", "high");    
+}
+add_action('admin_menu', 'register_meta_boxen');
+
+function second_column_box() {
+    echo <<<EOT
+    <script type="text/javascript">
+jQuery(document).ready(function() {
+    jQuery("#tinymce").addClass("mceEditor");
+    if ( typeof( tinyMCE ) == "object" &&
+         typeof( tinyMCE.execCommand ) == "function" ) {
+        tinyMCE.execCommand("mceAddControl", false, "tinymce");
+    }
+});
+</script>
+    <textarea id="tinymce" name="tinymce"></textarea>
+EOT;
+}
+
 /* 
 * add input fields for metabox 
 */
@@ -107,6 +131,7 @@ function build_futurninews_metabox( $post ) {
 <?php
 }
 
+
 /* 
 * Store data from fields 
 */
@@ -133,14 +158,13 @@ function save_metabox_data( $post_id ) {
 	if ( isset( $_REQUEST['current_content'] ) ) {
 		update_post_meta( $post_id, '_futu_content', sanitize_text_field( $_POST['content'] ) );
 	}
+
 	if ( isset( $_REQUEST['current_footer'] ) ) {
 		update_post_meta( $post_id, '_futu_footer', sanitize_text_field( $_POST['footer'] ) );
 	}
 }
 
 add_action( 'save_post_futurninews', 'save_metabox_data', 10, 2 );
-
-
 
 
 /*
