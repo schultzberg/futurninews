@@ -1,5 +1,3 @@
-<?php defined( 'ABSPATH' ) or die( 'No nooo noono nonoo no......no!' ); ?>
-
 <?php
 /*
 Plugin Name: Futurninews
@@ -9,14 +7,9 @@ Author:      Viktor Schultzberg
 Author URI:  http://viktorschultzberg.se
 */
 
+defined( 'ABSPATH' ) or die( 'No nooo noono nonoo no......no!' );
 
-
-/*
-*  ************************
-*  FUTURNINEWS PLUGIN SETUP
-*  ************************
-*  register custom post type
-*/ 
+define('FUTURNINEWS_DIR', WP_PLUGIN_DIR . '/');
 
 
 function newsletter_cpt() {
@@ -38,149 +31,47 @@ function newsletter_cpt() {
 
 	$args = array(
 		'labels'				=> $labels,
-		'publicly_queryable'	=> true,
+		'public'				=> true,
+		'has_archive'			=> true,
+		'hierarchical'			=> true,
+		'rewrite'				=> array( 'slug' => 'news', 'with_front' => false ),
 		'show_ui'				=> true,
 		'show_in_menu'			=> true,
-		'capability_type'		=> 'post',
-		'hierarchical'			=> false,
 		'menu_position'			=> 25,
-		'supports'				=> array( 'title', 'editor')
+		'capability_type'		=> 'post',
+		'supports'				=> array( 'title' )
 	);
-
 	register_post_type('futurninews', $args);
 }
-
 add_action( 'init', 'newsletter_cpt' );
 
+/* get single-template from plugin */
+function load_newsletter_template($template) {
+    global $post;
 
-/*
-*  *******************
-*  FUTURNINEWS METABOX
-*  *******************
-*/ 
+    // Is this a futurninews post?
+    if ($post->post_type == "futurninews"){
 
-/* 
-* add box: 
-*/
-function add_futurninews_metabox(){
-	add_meta_box( 
-		'futurninews_metabox', 
-		__( 'Create newsletter', 'futurninews_plugin' ), 
-		'build_futurninews_metabox', 
-		'futurninews', 
-		'side', 
-		'low'
-	);
-}
-add_action( 'add_meta_boxes_futurninews','add_futurninews_metabox');
+        $plugin_path = plugin_dir_path( __FILE__ );
 
-/*
-* Add WYSIWYG-editor:
-*/
-function register_meta_boxen() {
-	add_meta_box("wysiwyg-editor-2", "Second Column", "second_column_box",
-	"futurninews", "normal", "high");    
-}
-add_action('admin_menu', 'register_meta_boxen');
+        $template_name = 'single-newsletter.php';
 
-function second_column_box() {
-    echo <<<EOT
-    <script type="text/javascript">
-jQuery(document).ready(function() {
-    jQuery("#tinymce").addClass("mceEditor");
-    if ( typeof( tinyMCE ) == "object" &&
-         typeof( tinyMCE.execCommand ) == "function" ) {
-        tinyMCE.execCommand("mceAddControl", false, "tinymce");
+        // checks if there is a single template in themefolder, or it doesn't exist in the plugin
+        if($template === get_stylesheet_directory() . '/' . $template_name
+            || !file_exists($plugin_path . $template_name)) {
+
+            // returns "single.php" or "single-my-custom-post-type.php" from theme directory.
+            return $template;
+        }
+
+        // If not, return futurninews custom post type template.
+        return $plugin_path . $template_name;
     }
-});
-</script>
-    <textarea id="tinymce" name="tinymce"></textarea>
-EOT;
+
+    //This is not futurninews, do nothing with $template
+    return $template;
 }
-
-/* 
-* add input fields for metabox 
-*/
-function build_futurninews_metabox( $post ) {
-
-	wp_nonce_field( basename( __FILE__ ), 'futurninews_metabox_nonce' );
-
-	$current_header = get_post_meta( $post->ID, '_futu_header', true);
-	$current_content = get_post_meta( $post->ID, '_futu_content', true);
-	$current_header = get_post_meta( $post->ID, '_futu_footer', true);
-
-
-	?>
-	<div class="inside">
-
-		<h3><?php _e( 'Header', 'futurninews_plugin' ); ?></h3>
-		<p>
-			<input type="text" name="header" value="<?= $current_header ?>" />
-		</p>
-
-		<h3><?php _e( 'Content', 'futurninews_plugin' ); ?></h3>
-		<p>
-			<textarea name="content" rows="5" cols="30"> <?= $current_content ?> </textarea>
-		</p>
-
-		<h3><?php _e( 'Footer', 'futurninews_plugin' ); ?></h3>
-		<p>
-			<input type="text" name="footer" value="<?= $current_footer ?>" />
-		</p>
-	</div>
-<?php
-}
-
-
-/* 
-* Store data from fields 
-*/
-
-function save_metabox_data( $post_id ) {
-	// verify the futurninews nonce 
-	if ( !isset( $_POST['futurninews_metabox_nonce'] ) || !wp_verify_nonce( $_POST['futurninews_metabox_nonce'], basename( __FILE__ ) ) ){
-		return;
-	}
-	// return if autosave ???
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ){
-		return;
-	}
-	//
-	if ( ! current_user_can( 'edit_post', $post_id ) ){
-		return;
-	}
-
-	// store data:
-	if ( isset( $_REQUEST['current_header'] ) ) {
-		update_post_meta( $post_id, '_futu_header', sanitize_text_field( $_POST['header'] ) );
-	}
-
-	if ( isset( $_REQUEST['current_content'] ) ) {
-		update_post_meta( $post_id, '_futu_content', sanitize_text_field( $_POST['content'] ) );
-	}
-
-	if ( isset( $_REQUEST['current_footer'] ) ) {
-		update_post_meta( $post_id, '_futu_footer', sanitize_text_field( $_POST['footer'] ) );
-	}
-}
-
-add_action( 'save_post_futurninews', 'save_metabox_data', 10, 2 );
-
-
-/*
-HEADER
--header
-
-CONTENT
--hero
--heading
--text
--image
-FOOTER
-
--footer
--social
-*/
+add_filter('single_template', 'load_newsletter_template');
 
 
 ?>
