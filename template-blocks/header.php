@@ -19,10 +19,12 @@
 							<tr>
 								<td>
 									<span class="header-text-bold"><a href="http://ikea.today" style="color:#000;">IKEA.today</a></span>
-									<span class="header-text"><?php get_field( 'header' )?></span>
+									<?php if( get_field( 'header' ) ): ?>
+										<span class="header-text"><?= the_field( 'header' )?></span>
+									<?php endif; ?>
 								</td>
 								<td align="right" style="vertical-align:top; padding-top:5px;">
-									<a href="http://ikea.today"><img class="logo" src="<?= $imgURL . 'logo.png' ?>" alt="Ikea logotype" /></a>
+									<a href="http://ikea.today"><img class="logo" src="<?= plugins_url('futurninews' ) . '/img/logo.png' ?>" alt="Ikea logotype" /></a>
 								</td> 
 							</tr>
 						</table>

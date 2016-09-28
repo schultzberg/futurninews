@@ -6,25 +6,24 @@
  * @package WordPress
  */
 
-$dir = plugins_url( __FILE__ );
 $imgURL = plugins_url( 'img/', __FILE__ );
 
 if( have_posts() ) : while ( have_posts() ) : the_post(); 
 
-	// HTML, CSS + IKEA header:
+	// HTML, CSS and the IKEA header:
 	include 'template-blocks/header.php'; 
 	
 	//imports Hero image if exists.
-	if( get_field( 'hero-image' )) :
+	if( get_field( 'hero-image' ) ) :
 
 		include 'template-blocks/hero.php'; 
  		
 	endif;
 
-	if( have_rows( 'intro-post' )) : 
+	if( have_rows( 'intro-post' ) ) : 
 
 		//loops content of intro section.
-		while (have_rows( 'intro-post')) : the_row();
+		while ( have_rows( 'intro-post' ) ) : the_row();
 
 			include 'template-blocks/intro.php';
 
@@ -32,8 +31,8 @@ if( have_posts() ) : while ( have_posts() ) : the_post();
 
 	endif;
 
-	//Loops the content of post if exists.
-	if( have_rows( 'main-content' ) ) : while (have_rows( 'main-content')) : the_row();
+	//Loops the content of newsletter 
+	if( have_rows( 'main-content' ) ) : while ( have_rows( 'main-content' ) ) : the_row();
 
 		if( get_row_layout() == 'image' ):
 
@@ -43,11 +42,11 @@ if( have_posts() ) : while ( have_posts() ) : the_post();
 
 			include 'template-blocks/content-text.php';
 
-		elseif(get_row_layout() == 'quote' ):
+		elseif( get_row_layout() == 'quote' ):
 
 			include 'template-blocks/content-quote.php';
 
-		elseif(get_row_layout() == 'download' ):
+		elseif( get_row_layout() == 'download' ):
 
 			include 'template-blocks/content-download.php';
 
@@ -55,10 +54,10 @@ if( have_posts() ) : while ( have_posts() ) : the_post();
 
 	endwhile; endif;
 
-	if( get_field('signed') ):
+	if( get_field( 'signed' ) ):
 
 		include 'template-blocks/signed.php';
-	
+
 	endif;
 
 	include 'template-blocks/footer.php';

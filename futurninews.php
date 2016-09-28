@@ -73,5 +73,4 @@ function load_newsletter_template($template) {
 }
 add_filter('single_template', 'load_newsletter_template');
 
-
 ?>
