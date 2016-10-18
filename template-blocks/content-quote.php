@@ -9,7 +9,7 @@
           <table>
             <tr>
               <td style="vertical-align:top;">
-                <img src="<?= $imgURL . 'quote.png' ?>" class="image-quote" alt="Quotes">
+                <img src="<?= $imgDir . 'quote.png' ?>" class="image-quote" alt="Quotes">
               </td>
               <td>
                 <span class="quote"><?php the_sub_field('the-quote') ?></span>

@@ -9,9 +9,6 @@ Author URI:  http://viktorschultzberg.se
 
 defined( 'ABSPATH' ) or die( 'No nooo noono nonoo no......no!' );
 
-define('FUTURNINEWS_DIR', WP_PLUGIN_DIR . '/');
-
-
 function newsletter_cpt() {
 	$labels = array(
 		'name'					=> __( 'Futurninews',  'futurninews_plugin' ),
@@ -39,11 +36,31 @@ function newsletter_cpt() {
 		'show_in_menu'			=> true,
 		'menu_position'			=> 25,
 		'capability_type'		=> 'post',
-		'supports'				=> array( 'title' )
+		'supports'				=> false
 	);
 	register_post_type('futurninews', $args);
 }
 add_action( 'init', 'newsletter_cpt' );
+
+/* Adds heading to the Futurninews columns */
+function add_futurninews_columns($cols){
+	return array(
+		'cb' 		=> '<input type="checkbox" />;',
+		'title' 	=> 'Title',
+		'heading'	=> 'Heading',
+		'date'		=> 'Date'
+	);
+}
+
+function futurninews_col($col, $post_id) {
+	switch ($col) {
+		case 'heading' :
+			get_the_term_list( $post_id , '' , '' , ',' , '' );
+		break;
+	}
+}
+add_filter('manage_futurninews_posts_columns', 'add_futurninews_columns');
+add_action('manage_futurninews_post_custom_column', 'futurninews_columns', 10, 2);
 
 /* get single-template from plugin */
 function load_newsletter_template($template) {
@@ -72,5 +89,22 @@ function load_newsletter_template($template) {
     return $template;
 }
 add_filter('single_template', 'load_newsletter_template');
+
+
+function remove_menu(){
+	remove_menu_page('index.php');
+	remove_menu_page( 'index.php' );                  //Dashboard
+	remove_menu_page( 'edit.php' );                   //Posts
+	remove_menu_page( 'upload.php' );                 //Media
+	remove_menu_page( 'edit.php?post_type=page' );    //Pages
+	remove_menu_page( 'edit-comments.php' );          //Comments
+	remove_menu_page( 'themes.php' );                 //Appearance
+	remove_menu_page( 'plugins.php' );                //Plugins
+	remove_menu_page( 'users.php' );                  //Users
+	remove_menu_page( 'tools.php' );                  //Tools
+	remove_menu_page( 'options-general.php' );        //Settings
+}
+add_action('admin_menu', 'remove_menu');
+
 
 ?>
